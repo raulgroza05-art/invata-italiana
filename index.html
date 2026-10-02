@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>L'Italiano Interattivo - Învață Italiană Rapid</title>
+    <style>
+        :root {
+            --primary: #008c45;
+            --primary-hover: #006633;
+            --secondary: #cd212a;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --level-a: #16a34a;
+            --level-b: #d97706;
+            --level-c: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: #ffffff;
+            border-bottom: 2px solid var(--primary);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.25rem 1rem 0.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .site-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .site-title span {
+            color: var(--secondary);
+        }
+
+        .nav-container {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            padding: 0.85rem 1.5rem;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background-color: #f0fdf4;
+            border-radius: 8px 8px 0 0;
+        }
+
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 1.5rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
+        .controls-bar {
+            background: #ffffff;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .control-group label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .control-group select, .control-group input {
+            padding: 0.5rem 0.85rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            outline: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            background-color: #ffffff;
+        }
+
+        .badge-level {
+            font-weight: 800;
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            color: white;
+            font-size: 0.75rem;
+        }
+        .bg-a { background-color: var(--level-a); }
+        .bg-b { background-color: var(--level-b); }
+        .bg-c { background-color: var(--level-c); }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FILA 1: Vocabular */
+        .vocab-table-container {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .vocab-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .vocab-table th, .vocab-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .vocab-table th {
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .vocab-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .audio-btn {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: var(--primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+
+        .audio-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* FILA 2: Flashcards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .flashcard {
+            height: 200px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.25rem;
+            border: 1px solid var(--border);
+        }
+
+        .card-front {
+            background-color: #ffffff;
+            color: var(--text-main);
+        }
+
+        .card-back {
+            background-color: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .card-front .word-it {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin: 0.5rem 0;
+            color: var(--primary);
+        }
+
+        .card-back .word-ro {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .card-domain {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .card-level {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* FILA 3: Quiz */
+        .quiz-container {
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-question {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .quiz-option-btn {
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border);
+            background: #ffffff;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quiz-option-btn:hover {
+            border-color: var(--primary);
+            background-color: #f0fdf4;
+        }
+
+        .quiz-option-btn.correct {
+            background-color: #dcfce7 !important;
+            border-color: var(--level-a) !important;
+            color: #15803d;
+        }
+
+        .quiz-option-btn.wrong {
+            background-color: #fee2e2 !important;
+            border-color: var(--level-c) !important;
+            color: #b91c1c;
+        }
+
+        .quiz-controls {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-next {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-next:hover {
+            background: var(--primary-hover);
+        }
+
+        .score-board {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .score-number {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .style-box {
+            margin-top: 2.5rem;
+            padding: 1.25rem;
+            background-color: #ffffff;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <h1 class="site-title">L'Italiano Interattivo <span>.it</span></h1>
+            <nav class="nav-container">
+                <button class="tab-btn active" onclick="switchTab('vocabular')">Fila 1: Vocabular Text & Audio</button>
+                <button class="tab-btn" onclick="switchTab('cards')">Fila 2: Carduri de Memorie (Flashcards)</button>
+                <button class="tab-btn" onclick="switchTab('quiz')">Fila 3: Quiz Interactiv</button>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- Panou Filtre Globale -->
+        <div class="controls-bar">
+            <div class="control-group">
+                <label for="filter-level">Dificultate:</label>
+                <select id="filter-level" onchange="applyFilters()">
+                    <option value="all">Toate 3 (A, B, C)</option>
+                    <option value="A">Ușor (A)</option>
+                    <option value="B">Mediu (B)</option>
+                    <option value="C">Dificil (C)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="filter-domain">Domeniu Tematic:</label>
+                <select id="filter-domain" onchange="applyFilters()">
+                    <option value="all">Toate Domeniile</option>
+                    <option value="saluturi">Saluturi & Conversație</option>
+                    <option value="restaurant">La Restaurant & Cafenea</option>
+                    <option value="plimbare">La Plimbare & Oraș</option>
+                    <option value="urgente">Urgențe & Sănătate</option>
+
+                    <option value="munca">La Muncă & Șantier</option>
+                    <option value="cumparaturi">Cumpărături & Magazin</option>
+                </select>
+            </div>
+
+            <div class="control-group" style="margin-left: auto;">
+                <input type="text" id="search-input" placeholder="Caută cuvânt sau expresie..." oninput="applyFilters()">
+            </div>
+        </div>
+
+        <!-- FILA 1: VOCABULAR -->
+        <section id="tab-vocabular" class="tab-content active">
+            <div class="vocab-table-container">
+                <table class="vocab-table">
+                    <thead>
+                        <tr>
+                            <th>Limba Italiană</th>
+                            <th>Traducere Română</th>
+                            <th>Dificultate</th>
+                            <th>Domeniu</th>
+                            <th>Pronunție Audio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vocab-tbody">
+                        <!-- Generat dinamic -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FILA 2: CARDURI DE MEMORIE -->
+        <section id="tab-cards" class="tab-content">
+            <div class="cards-grid" id="cards-container">
+                <!-- Generat dinamic -->
+            </div>
+        </section>
+
+        <!-- FILA 3: QUIZ TESTE -->
+        <section id="tab-quiz" class="tab-content">
+            <div class="quiz-container" id="quiz-box">
+                <!-- Generat dinamic -->
+            </div>
+        </section>
+
+        <div class="style-box">
+            <strong>Style Box:</strong> Sistem complet de învățare a limbii italiene structurat pe 3 file interactive (Vocabular Audio, Carduri Flash3D, Quiz Evaluare). Integrare nativă cu Web Speech API (`it-IT`) pentru redare vocală automată, clasificare pe nivele europene de dificultate (A, B, C) și împărțire pe domenii situaționale practice.
+        </div>
+    </main>
+
+    <script>
+        // BAZA DE DATE DE CUVINTE ȘI EXPRESII
+        const database = [
+            // SALUTURI & CONVERSAȚIE
+            { id: 1, it: "Buongiorno", ro: "Bună dimineața / Bună ziua", level: "A", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 2, it: "Buonasera", ro: "Bună seara", level: "A", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 3, it: "Come stai?", ro: "Ce mai faci?", level: "A", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 4, it: "Piacere di conoscerti", ro: "Încântat de cunoștință", level: "A", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 5, it: "Arrivederci", ro: "La revedere", level: "A", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 6, it: "Come ti chiami?", ro: "Cum te cheamă?", level: "A", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 7, it: "Da dove vieni?", ro: "De unde ești?", level: "B", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 8, it: "Ci vediamo presto", ro: "Ne vedem curând", level: "B", domain: "saluturi", domainLabel: "Saluturi" },
+            { id: 9, it: "Farsi vivo", ro: "A da un semn de viață", level: "C", domain: "saluturi", domainLabel: "Saluturi" },
+
+            // LA RESTAURANT
+            { id: 10, it: "Vorrei prenotare un tavolo", ro: "Aș dori să rezerv o masă", level: "A", domain: "restaurant", domainLabel: "Restaurant" },
+            { id: 11, it: "Il menu, per favore", ro: "Meniul, vă rog", level: "A", domain: "restaurant", domainLabel: "Restaurant" },
+            { id: 12, it: "Il conto, per favore", ro: "Nota de plată, vă rog", level: "A", domain: "restaurant", domainLabel: "Restaurant" },
+            { id: 13, it: "Un caffè espresso, grazie", ro: "Un espresso, mulțumesc", level: "A", domain: "restaurant", domainLabel: "Restaurant" },
+            { id: 14, it: "Senza glutine", ro: "Fără gluten", level: "B", domain: "restaurant", domainLabel: "Restaurant" },
+            { id: 15, it: "Cosa mi consiglia?", ro: "Ce îmi recomandați?", level: "B", domain: "restaurant", domainLabel: "Restaurant" },
+            { id: 16, it: "Servizio incluso?", ro: "Serviciul este inclus?", level: "B", domain: "restaurant", domainLabel: "Restaurant" },
+            { id: 17, it: "Cottura al sangue / ben cotta", ro: "Făcută în sânge / bine făcută", level: "C", domain: "restaurant", domainLabel: "Restaurant" },
+
+            // LA PLIMBARE & ORAȘ
+            { id: 18, it: "Dov'è la stazione?", ro: "Unde este gara?", level: "A", domain: "plimbare", domainLabel: "La Plimbare" },
+            { id: 19, it: "Girare a destra / sinistra", ro: "A face la dreapta / stânga", level: "A", domain: "plimbare", domainLabel: "La Plimbare" },
+            { id: 20, it: "Dritto fino al semaforo", ro: "Tot înainte până la semafor", level: "B", domain: "plimbare", domainLabel: "La Plimbare" },
+            { id: 21, it: "Quanto dista da qui?", ro: "Cât de departe este de aici?", level: "B", domain: "plimbare", domainLabel: "La Plimbare" },
+            { id: 22, it: "Un biglietto solo andata", ro: "Un bilet doar dus", level: "B", domain: "plimbare", domainLabel: "La Plimbare" },
+            { id: 23, it: "Perdersi nei vicoli", ro: "A se rătăci pe străduțe", level: "C", domain: "plimbare", domainLabel: "La Plimbare" },
+
+            // URGENȚE & SĂNĂTATE
+            { id: 24, it: "Aiuto!", ro: "Ajutor!", level: "A", domain: "urgente", domainLabel: "Urgențe" },
+            { id: 25, it: "Chiamate un'ambulanza!", ro: "Chemați o ambulanță!", level: "A", domain: "urgente", domainLabel: "Urgențe" },
+            { id: 26, it: "Ho bisogno di un medico", ro: "Am nevoie de un medic", level: "A", domain: "urgente", domainLabel: "Urgențe" },
+            { id: 27, it: "Mi fa male qui", ro: "Mă doare aici", level: "B", domain: "urgente", domainLabel: "Urgențe" },
+            { id: 28, it: "Ho perso il portafoglio", ro: "Mi-am pierdut portofelul", level: "B", domain: "urgente", domainLabel: "Urgențe" },
+            { id: 29, it: "Pronto soccorso", ro: "Unitate de primiri urgențe", level: "C", domain: "urgente", domainLabel: "Urgențe" },
+
+            // LA MUNCĂ & ȘANTIER
+            { id: 30, it: "Lavoro in cantiere", ro: "Lucrez pe șantier", level: "A", domain: "munca", domainLabel: "La Muncă" },
+            { id: 31, it: "Casco di sicurezza", ro: "Cască de protecție", level: "A", domain: "munca", domainLabel: "La Muncă" },
+            { id: 32, it: "Attrezzi da lavoro", ro: "Unelte de lucru", level: "A", domain: "munca", domainLabel: "La Muncă" },
+            { id: 33, it: "Massetto di sottofondo", ro: "Șapă de nivelare", level: "B", domain: "munca", domainLabel: "La Muncă" },
+            { id: 34, it: "Intonaco e cartongesso", ro: "Tencuială și gips-carton", level: "B", domain: "munca", domainLabel: "La Muncă" },
+            { id: 35, it: "Computo metrico estimativo", ro: "Deviz de lucrări / Antemăsurătoare", level: "C", domain: "munca", domainLabel: "La Muncă" },
+            { id: 36, it: "Muro portante e trave", ro: "Perete de rezistență și grindă", level: "C", domain: "munca", domainLabel: "La Muncă" },
+
+            // CUMPĂRĂTURI
+            { id: 37, it: "Quanto costa questo?", ro: "Cât costă acesta?", level: "A", domain: "cumparaturi", domainLabel: "Cumpărături" },
+            { id: 38, it: "Posso pagare con carta?", ro: "Pot plăti cu cardul?", level: "A", domain: "cumparaturi", domainLabel: "Cumpărături" },
+            { id: 39, it: "Posso provarlo?", ro: "Pot să îl probez?", level: "B", domain: "cumparaturi", domainLabel: "Cumpărături" },
+            { id: 40, it: "Scontrino fiscale", ro: "Bon fiscal", level: "C", domain: "cumparaturi", domainLabel: "Cumpărături" }
+        ];
+
+        let currentTab = 'vocabular';
+        let quizState = {
+            questions: [],
+            currentIndex: 0,
+            score: 0
+        };
+
+        // FUNCȚIE PRONUNȚIE AUDIO (Speech Synthesis)
+        function speakItalian(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Oprește vorbirea anterioară
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'it-IT';
+                utterance.rate = 0.9; // Viteză naturală
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Browserul dvs. nu suportă sinteza vocală audio.");
+            }
+        }
+
+        // SCHIMBARE TAB-URI
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            if (tabName === 'vocabular') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-vocabular').classList.add('active');
+            } else if (tabName === 'cards') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-cards').classList.add('active');
+            } else if (tabName === 'quiz') {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('tab-quiz').classList.add('active');
+                startQuiz();
+            }
+            applyFilters();
+        }
+
+        // APLICARE FILTRE (A, B, C / DOMENII / CĂUTARE)
+        function getFilteredData() {
+            const levelVal = document.getElementById('filter-level').value;
+            const domainVal = document.getElementById('filter-domain').value;
+            const searchVal = document.getElementById('search-input').value.toLowerCase().trim();
+
+            return database.filter(item => {
+                const matchLevel = (levelVal === 'all' || item.level === levelVal);
+                const matchDomain = (domainVal === 'all' || item.domain === domainVal);
+                const matchSearch = (searchVal === '' || 
+                                     item.it.toLowerCase().includes(searchVal) || 
+                                     item.ro.toLowerCase().includes(searchVal));
+                return matchLevel && matchDomain && matchSearch;
+            });
+        }
+
+        function applyFilters() {
+            const filtered = getFilteredData();
+
+            if (currentTab === 'vocabular') {
+                renderVocabular(filtered);
+            } else if (currentTab === 'cards') {
+                renderCards(filtered);
+            } else if (currentTab === 'quiz') {
+                startQuiz();
+            }
+        }
+
+        // FILA 1: RENDER VOCABULAR
+        function renderVocabular(data) {
+            const tbody = document.getElementById('vocab-tbody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:2rem;">Nu s-au găsit cuvinte pentru filtrele selectate.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight:700; color:var(--primary);">${item.it}</td>
+                    <td>${item.ro}</td>
+                    <td><span class="badge-level bg-${item.level.toLowerCase()}">${item.level}</span></td>
+                    <td style="font-size:0.85rem; color:var(--text-muted);">${item.domainLabel}</td>
+                    <td>
+                        <button class="audio-btn" onclick="speakItalian('${item.it.replace(/'/g, "\'")}')">
+                            🔊 Ascultă
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // FILA 2: RENDER FLASHCARDS
+        function renderCards(data) {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+
+            if (data.length === 0) {
+                container.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:2rem;">Nu există carduri disponibile.</div>`;
+                return;
+            }
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'flashcard';
+                card.onclick = function(e) {
+                    // Dacă nu s-a apăsat direct pe butonul audio, dăm flip și rostim cuvântul
+                    if (!e.target.classList.contains('audio-btn')) {
+                        this.classList.toggle('flipped');
+                        speakItalian(item.it);
+                    }
+                };
+
+                card.innerHTML = `
+                    <div class="flashcard-inner">
+                        <div class="card-front">
+                            <span class="card-domain">${item.domainLabel}</span>
+                            <span class="badge-level bg-${item.level.toLowerCase()} card-level">${item.level}</span>
+                            <span class="word-it">${item.it}</span>
+                            <button class="audio-btn" onclick="event.stopPropagation(); speakItalian('${item.it.replace(/'/g, "\'")}')">🔊 Audio</button>
+                            <span style="font-size:0.75rem; color:var(--text-muted); margin-top:0.5rem;">Click pentru traducere</span>
+                        </div>
+                        <div class="card-back">
+                            <span class="word-ro">${item.ro}</span>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // FILA 3: QUIZ INTERACTIV
+        function startQuiz() {
+            const filtered = getFilteredData();
+            if (filtered.length < 3) {
+                document.getElementById('quiz-box').innerHTML = `
+                    <div style="text-align:center; padding:2rem;">
+                        <h3>Sunt necesare cel puțin 3 cuvinte pentru a genera un Quiz.</h3>
+                        <p>Schimbă filtrele de dificultate sau domeniu pentru mai multe opțiuni.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Amestecăm întrebările
+            quizState.questions = [...filtered].sort(() => 0.5 - Math.random());
+            quizState.currentIndex = 0;
+            quizState.score = 0;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            const quizBox = document.getElementById('quiz-box');
+            if (quizState.currentIndex >= quizState.questions.length || quizState.currentIndex >= 10) {
+                // Sfârșit Quiz
+                const total = Math.min(quizState.questions.length, 10);
+                quizBox.innerHTML = `
+                    <div class="score-board">
+                        <h2>Felicitări! Ai finalizat testul.</h2>
+                        <p>Scorul tău este:</p>
+                        <div class="score-number">${quizState.score} / ${total}</div>
+                        <button class="btn-next" onclick="startQuiz()">Reia Testul</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const currentItem = quizState.questions[quizState.currentIndex];
+            
+            // Generare variante greșite
+            const otherOptions = database.filter(i => i.id !== currentItem.id);
+            const shuffledOthers = otherOptions.sort(() => 0.5 - Math.random()).slice(0, 3);
+            const allOptions = [currentItem, ...shuffledOthers].sort(() => 0.5 - Math.random());
+
+            quizBox.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:1rem; color:var(--text-muted); font-size:0.9rem;">
+                    <span>Întrebarea ${quizState.currentIndex + 1} din ${Math.min(quizState.questions.length, 10)}</span>
+                    <span>Dificultate: <strong>${currentItem.level}</strong></span>
+                </div>
+                <div class="quiz-question">
+                    Care este traducerea corectă pentru: <span style="color:var(--primary);">${currentItem.it}</span>?
+                </div>
+                <div class="quiz-options">
+                    ${allOptions.map(opt => `
+                        <button class="quiz-option-btn" onclick="checkAnswer(this, ${opt.id === currentItem.id}, '${currentItem.it.replace(/'/g, "\'")}')">
+                            ${opt.ro}
+                        </button>
+                    `).join('')}
+                </div>
+                <div class="quiz-controls">
+                    <button class="audio-btn" onclick="speakItalian('${currentItem.it.replace(/'/g, "\'")}')">🔊 Pronunție</button>
+                    <button class="btn-next" id="next-btn" style="display:none;" onclick="nextQuestion()">Următoarea ➔</button>
+                </div>
+            `;
+        }
+
+        function checkAnswer(btn, isCorrect, italianText) {
+            speakItalian(italianText);
+            const allBtns = document.querySelectorAll('.quiz-option-btn');
+            allBtns.forEach(b => b.disabled = true);
+
+            if (isCorrect) {
+                btn.classList.add('correct');
+                quizState.score++;
+            } else {
+                btn.classList.add('wrong');
+            }
+
+            document.getElementById('next-btn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            quizState.currentIndex++;
+            renderQuestion();
+        }
+
+        // Inițializare
+        document.addEventListener('DOMContentLoaded', () => {
+            applyFilters();
+        });
+    </script>
+</body>
+</html>
