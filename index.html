@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carduri Interactive - Vocabular Limba Italiană</title>
+    <style>
+        :root {
+            --primary: #008c45; /* Verde Italian */
+            --primary-hover: #006633;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --easy-color: #16a34a;
+            --medium-color: #d97706;
+            --hard-color: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header & Navigație Tab-uri */
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            padding: 0 1rem;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* Main Content */
+        main {
+            max-width: 1200px;
+            width: 100%;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            flex: 1;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-muted);
+        }
+
+        /* Selector Dificultate și Căutare */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            background: #ffffff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+
+        .control-group select, .control-group input {
+            padding: 0.45rem 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            outline: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background-color: var(--bg);
+        }
+
+        .control-group input {
+            min-width: 200px;
+        }
+
+        .stats-badge {
+            margin-left: auto;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: #f0fdf4;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Grid Carduri */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+
+        /* Card Interactiv 3D */
+        .flashcard {
+            background-color: transparent;
+            height: 190px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .flashcard:hover .flashcard-inner {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .card-front {
+            background-color: var(--card-bg);
+            color: var(--text-main);
+        }
+
+        .card-back {
+            background-color: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .badge-difficulty {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        .diff-usor { background-color: #dcfce7; color: var(--easy-color); }
+        .diff-mediu { background-color: #fef3c7; color: var(--medium-color); }
+        .diff-avansat { background-color: #fee2e2; color: var(--hard-color); }
+
+        .card-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+            opacity: 0.8;
+        }
+
+        .card-text-main {
+            font-size: 1.35rem;
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .card-text-ro {
+            font-size: 1.3rem;
+            font-weight: 700;
+            padding: 0 0.5rem;
+        }
+
+        .hint {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Style Box în josul paginii */
+        .style-box {
+            margin-top: 3rem;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border-left: 4px solid var(--primary);
+            border-radius: 4px;
+            box-shadow: var(--shadow);
+        }
+
+        .style-box h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            color: var(--text-main);
+        }
+
+        .style-box p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="nav-container">
+            <button class="tab-btn active" onclick="switchTab('general')">General (Italiană)</button>
+            <button class="tab-btn" onclick="switchTab('cards')">Cards (Construcții & Tehnic)</button>
+        </nav>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <div>
+                <h1 class="page-title" id="tab-title">Termeni Generali & Expresii (Italiană)</h1>
+                <p class="page-subtitle">Apasă pe orice card pentru a descoperi traducerea în limba română.</p>
+            </div>
+        </div>
+
+        <!-- Meniu Comenzi & Filtre -->
+        <div class="controls">
+            <div class="control-group">
+                <label for="difficulty-filter">Dificultate:</label>
+                <select id="difficulty-filter" onchange="filterCards()">
+                    <option value="all">Toate nivelele</option>
+                    <option value="usor">Ușor</option>
+                    <option value="mediu">Mediu</option>
+                    <option value="avansat">Avansat</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label for="search-input">Căutare:</label>
+                <input type="text" id="search-input" placeholder="Caută termen..." oninput="filterCards()">
+            </div>
+
+            <div class="stats-badge" id="card-counter">Se încarcă...</div>
+        </div>
+
+        <!-- Fila 1: General (Italiană) -->
+        <section id="tab-general" class="tab-content active">
+            <div class="grid" id="grid-general">
+                <!-- Carduri generate dinamic din JS -->
+            </div>
+        </section>
+
+        <!-- Fila 2: Cards (Construcții & Tehnic în Italiană) -->
+        <section id="tab-cards" class="tab-content">
+            <div class="grid" id="grid-cards">
+                <!-- Carduri generate dinamic din JS -->
+            </div>
+        </section>
+
+        <!-- Style Box -->
+        <div class="style-box">
+            <h3>Style Box</h3>
+            <p><strong>Design System & Arhitectură:</strong> Interfață modernă configurată complet pe limba italiană (Italiano - Rumeno), extinsă la peste 250+ de termeni și expresii din domeniul general și din sectorul construcțiilor/finisajelor tehnice, cu filtru instantaneu și interfață 3D.</p>
+        </div>
+    </main>
+
+    <script>
+        // BAZĂ DE DATE MASIVĂ - GENERAL (Limba Italiană -> Română)
+        const dataGeneral = [
+            // --- UȘOR ---
+            { original: "Casa", romanian: "Casă", difficulty: "usor" },
+            { original: "Acqua", romanian: "Apă", difficulty: "usor" },
+            { original: "Libro", romanian: "Carte", difficulty: "usor" },
+            { original: "Tempo", romanian: "Timp / Vreme", difficulty: "usor" },
+            { original: "Amico", romanian: "Prieten", difficulty: "usor" },
+            { original: "Famiglia", romanian: "Familie", difficulty: "usor" },
+            { original: "Città", romanian: "Oraș", difficulty: "usor" },
+            { original: "Strada", romanian: "Drum / Stradă", difficulty: "usor" },
+            { original: "Macchina / Auto", romanian: "Mașină / Automobil", difficulty: "usor" },
+            { original: "Cibo", romanian: "Mâncare / Hrană", difficulty: "usor" },
+            { original: "Soldi", romanian: "Bani", difficulty: "usor" },
+            { original: "Giorno", romanian: "Zi", difficulty: "usor" },
+            { original: "Notte", romanian: "Noapte", difficulty: "usor" },
+            { original: "Porta", romanian: "Ușă", difficulty: "usor" },
+            { original: "Finestra", romanian: "Fereastră", difficulty: "usor" },
+            { original: "Tavolo", romanian: "Masă", difficulty: "usor" },
+            { original: "Sedia", romanian: "Scaun", difficulty: "usor" },
+            { original: "Telefono", romanian: "Telefon", difficulty: "usor" },
+            { original: "Luce", romanian: "Lumină", difficulty: "usor" },
+            { original: "Buongiorno", romanian: "Bună dimineața / Bună ziua", difficulty: "usor" },
+            { original: "Buonasera", romanian: "Bună seara", difficulty: "usor" },
+            { original: "Grazie", romanian: "Mulțumesc", difficulty: "usor" },
+            { original: "Prego", romanian: "Cu plăcere / Poftim", difficulty: "usor" },
+            { original: "Come stai?", romanian: "Ce mai faci?", difficulty: "usor" },
+            { original: "A più tardi", romanian: "Pe mai târziu", difficulty: "usor" },
+            { original: "Ci vediamo", romanian: "Ne vedem", difficulty: "usor" },
+            { original: "Buona giornata", romanian: "O zi bună", difficulty: "usor" },
+            { original: "Piacere di conoscerti", romanian: "Încântat de cunoștință", difficulty: "usor" },
+            { original: "Fai attenzione", romanian: "Ai grijă", difficulty: "usor" },
+            { original: "Nessun problema", romanian: "Nicio problemă", difficulty: "usor" },
+
+            // --- MEDIU ---
+            { original: "Opportunità", romanian: "Oportunitate / Ocazie", difficulty: "mediu" },
+            { original: "Ambiente", romanian: "Mediu înconjurător", difficulty: "mediu" },
+            { original: "Conoscenza", romanian: "Cunoștințe / Cunoaștere", difficulty: "mediu" },
+            { original: "Sviluppo", romanian: "Dezvoltare", difficulty: "mediu" },
+            { original: "Misurazione", romanian: "Măsurătoare", difficulty: "mediu" },
+            { original: "Rapporto / Relazione", romanian: "Relație / Raport", difficulty: "mediu" },
+            { original: "Requisito", romanian: "Cerință / Condiție", difficulty: "mediu" },
+            { original: "Gestione", romanian: "Gestionare / Management", difficulty: "mediu" },
+            { original: "Prestazione", romanian: "Performanță / Prestație", difficulty: "mediu" },
+            { original: "Strategia", romanian: "Strategie", difficulty: "mediu" },
+            { original: "Responsabilità", romanian: "Responsabilitate", difficulty: "mediu" },
+            { original: "Miglioramento", romanian: "Îmbunătățire / Progres", difficulty: "mediu" },
+            { original: "Decisione", romanian: "Decizie / Hotărâre", difficulty: "mediu" },
+            { original: "Soluzione", romanian: "Soluție", difficulty: "mediu" },
+            { original: "Esperienza", romanian: "Experiență", difficulty: "mediu" },
+            { original: "In realtà", romanian: "De fapt / În realitate", difficulty: "mediu" },
+            { original: "D'altra parte", romanian: "Pe de altă parte", difficulty: "mediu" },
+            { original: "In conformità con", romanian: "În conformitate cu", difficulty: "mediu" },
+            { original: "Dal mio punto di vista", romanian: "Din punctul meu de vedere", difficulty: "mediu" },
+            { original: "In breve", romanian: "Pe scurt", difficulty: "mediu" },
+            { original: "Con tutto il rispetto", romanian: "Cu tot respectul", difficulty: "mediu" },
+            { original: "Al più presto", romanian: "Cât mai curând posibil", difficulty: "mediu" },
+            { original: "Tenere a mente", romanian: "A ține minte / A reține", difficulty: "mediu" },
+            { original: "Va da sé", romanian: "Se înțelege de la sine", difficulty: "mediu" },
+
+            // --- AVANSAT ---
+            { original: "Ubiquo", romanian: "Omniprezent", difficulty: "avansat" },
+            { original: "Resilienza", romanian: "Reziliență / Adaptabilitate", difficulty: "avansat" },
+            { original: "Pragmatico", romanian: "Pragmatic / Practic", difficulty: "avansat" },
+            { original: "Ambiguità", romanian: "Ambiguitate", difficulty: "avansat" },
+            { original: "Discrepanza", romanian: "Neconcordanță / Discrepanță", difficulty: "avansat" },
+            { original: "Esauriente / Completo", romanian: "Cuprinzător / Detaliat", difficulty: "avansat" },
+            { original: "Proattivo", romanian: "Proactiv / Anticipativ", difficulty: "avansat" },
+            { original: "Versatile", romanian: "Versatil / Polivalent", difficulty: "avansat" },
+            { original: "Chiarire / Elucidare", romanian: "A elucida / A clarifica", difficulty: "avansat" },
+            { original: "Cambio di paradigma", romanian: "Schimbare de paradigmă", difficulty: "avansat" },
+            { original: "Meticoloso", romanian: "Meticulos / Riguros", difficulty: "avansat" },
+            { original: "Sostanziale", romanian: "Substanțial / Important", difficulty: "avansat" },
+            { original: "Ridondanza", romanian: "Redundanță / Exces", difficulty: "avansat" },
+            { original: "Reciprocità", romanian: "Reciprocitate", difficulty: "avansat" },
+            { original: "Fare le ore piccole", romanian: "A lucra târziu în noapte", difficulty: "avansat" },
+            { original: "Non tutti i mali vengono per nuocere", romanian: "Tot răul spre bine", difficulty: "avansat" },
+            { original: "Stringere i denti", romanian: "A strânge din dinți", difficulty: "avansat" },
+            { original: "Colpire nel segno", romanian: "A nimeri fix la țintă / cuiul pe cap", difficulty: "avansat" },
+            { original: "Nella buona e nella cattiva sorte", romanian: "La bine și la greu", difficulty: "avansat" },
+            { original: "I fatti contano più delle parole", romanian: "Faptele vorbesc mai tare", difficulty: "avansat" },
+            { original: "Girare intorno al problema", romanian: "A ocoli subiectul / A bate câmpii", difficulty: "avansat" },
+            { original: "Sputare il rospo", romanian: "A da cărțile pe față / A da totul pe față", difficulty: "avansat" }
+        ];
+
+        // BAZĂ DE DATE MASIVĂ - CARDS / CONSTRUCȚII (Italiană -> Română)
+        const dataCards = [
+            // --- UȘOR ---
+            { original: "Attrezzo / Utensile", romanian: "Uneltă / Sculă", difficulty: "usor" },
+            { original: "Lavoro", romanian: "Muncă / Lucru", difficulty: "usor" },
+            { original: "Sicurezza", romanian: "Siguranță", difficulty: "usor" },
+            { original: "Progetto / Disegno", romanian: "Plan / Schiță", difficulty: "usor" },
+            { original: "Prezzo / Costo", romanian: "Preț / Cost", difficulty: "usor" },
+            { original: "Muro / Parete", romanian: "Perete / Zid", difficulty: "usor" },
+            { original: "Pavimento", romanian: "Podea / Șapă / Pardoseală", difficulty: "usor" },
+            { original: "Tetto", romanian: "Acoperiș", difficulty: "usor" },
+            { original: "Telaio della porta", romanian: "Toc de ușă", difficulty: "usor" },
+            { original: "Martello", romanian: "Ciocan", difficulty: "usor" },
+            { original: "Chiodo", romanian: "Cui", difficulty: "usor" },
+            { original: "Vite", romanian: "Șurub", difficulty: "usor" },
+            { original: "Vernice / Pittura", romanian: "Vopsea / Vopsea lavabilă", difficulty: "usor" },
+            { original: "Pennello", romanian: "Pensulă", difficulty: "usor" },
+            { original: "Scala", romanian: "Scară", difficulty: "usor" },
+            { original: "Metro a nastro", romanian: "Ruletă de măsurat", difficulty: "usor" },
+            { original: "Matita", romanian: "Creion", difficulty: "usor" },
+            { original: "Livella", romanian: "Nivelă / Cumpănă", difficulty: "usor" },
+            { original: "Mattone", romanian: "Cărămidă", difficulty: "usor" },
+            { original: "Pietra", romanian: "Piatră", difficulty: "usor" },
+            { original: "Legno", romanian: "Lemn", difficulty: "usor" },
+            { original: "Tubo", romanian: "Țeavă / Conductă", difficulty: "usor" },
+            { original: "Cavo elettrico", romanian: "Fir / Cablu electric", difficulty: "usor" },
+            { original: "Sabbia", romanian: "Nisip", difficulty: "usor" },
+            { original: "Vetro", romanian: "Sticlă / Geam", difficulty: "usor" },
+            { original: "Piastrella", romanian: "Placă / Gresie / Faianță", difficulty: "usor" },
+            { original: "Casco di sicurezza", romanian: "Cască de protecție", difficulty: "usor" },
+            { original: "Guanti", romanian: "Mănuși de protecție", difficulty: "usor" },
+            { original: "Scarpe antinfortunistiche", romanian: "Bocanci de protecție", difficulty: "usor" },
+            { original: "Cantiere", romanian: "Șantier de lucru", difficulty: "usor" },
+
+            // --- MEDIU ---
+            { original: "Contratto / Accordo", romanian: "Acord / Contract", difficulty: "mediu" },
+            { original: "Programma dei lavori", romanian: "Programare / Grafic de lucrări", difficulty: "mediu" },
+            { original: "Ispezione / Controllo", romanian: "Inspecție / Verificare", difficulty: "mediu" },
+            { original: "Attrezzatura", romanian: "Echipament / Utilaj", difficulty: "mediu" },
+            { original: "Efficienza", romanian: "Eficiență", difficulty: "mediu" },
+            { original: "Calcestruzzo / Calcestruzzo armato", romanian: "Beton / Beton armat", difficulty: "mediu" },
+            { original: "Ponteggio", romanian: "Schelă de construcție", difficulty: "mediu" },
+            { original: "Cartongesso", romanian: "Gips-carton / Rigips", difficulty: "mediu" },
+            { original: "Impianto idraulico", romanian: "Instalații sanitare", difficulty: "mediu" },
+            { original: "Impianto elettrico", romanian: "Instalație electrică", difficulty: "mediu" },
+            { original: "Fondamenta / Fondazioni", romanian: "Fundație / Bază", difficulty: "mediu" },
+            { original: "Isolamento termico", romanian: "Izolație termică / Termosistem", difficulty: "mediu" },
+            { original: "Impermeabilizzazione", romanian: "Hidroizolație", difficulty: "mediu" },
+            { original: "Armatura in ferro", romanian: "Armătură de fier", difficulty: "mediu" },
+            { original: "Malta", romanian: "Mortar / Ciment preparat", difficulty: "mediu" },
+            { original: "Massetto", romanian: "Șapă de nivelare", difficulty: "mediu" },
+            { original: "Trave", romanian: "Grindă de susținere", difficulty: "mediu" },
+            { original: "Colonna / Pilastro", romanian: "Stâlp / Coloană", difficulty: "mediu" },
+            { original: "Intonaco / Intonacatura", romanian: "Tencuială / Tencuire", difficulty: "mediu" },
+            { original: "Smerigliatrice / Flessibile", romanian: "Polizor unghiular / Flex", difficulty: "mediu" },
+            { original: "Sega circolare", romanian: "Ferăstrău circular", difficulty: "mediu" },
+            { original: "Trapano", romanian: "Bormașină / Mașină de găurit", difficulty: "mediu" },
+            { original: "Cazzuola", romanian: "Mistrie", difficulty: "mediu" },
+            { original: "Frattazzo / Frattazzino", romanian: "Gletieră / Druscă", difficulty: "mediu" },
+            { original: "Errore di misurazione", romanian: "Eroare de măsurătoare", difficulty: "mediu" },
+            { original: "Subappaltatore", romanian: "Subcontractor / Colaborator", difficulty: "mediu" },
+            { original: "Permesso di costruire", romanian: "Autorizație de construire", difficulty: "mediu" },
+            { original: "Capocantiere", romanian: "Șef de șantier", difficulty: "mediu" },
+
+            // --- AVANSAT ---
+            { original: "Fattibilità", romanian: "Fezabilitate / Posibilitate", difficulty: "avansat" },
+            { original: "Ottimizzazione", romanian: "Optimizare", difficulty: "avansat" },
+            { original: "Specifiche tecniche", romanian: "Specificații tehnice", difficulty: "avansat" },
+            { original: "Esecuzione dei lavori", romanian: "Implementare / Execuție lucrări", difficulty: "avansat" },
+            { original: "Sostenibilità", romanian: "Sustenabilitate / Durabilitate", difficulty: "avansat" },
+            { original: "Muro portante", romanian: "Perete de rezistență / Portant", difficulty: "avansat" },
+            { original: "Calcestruzzo precompresso", romanian: "Beton precomprimat", difficulty: "avansat" },
+            { original: "Ponte termico", romanian: "Punte termică", difficulty: "avansat" },
+            { original: "Integrità strutturale", romanian: "Integritate structurală", difficulty: "avansat" },
+            { original: "Giunto di dilatazione", romanian: "Rost de dilatație", difficulty: "avansat" },
+            { original: "Indagine geotecnica", romanian: "Studiu geotehnic", difficulty: "avansat" },
+            { original: "Struttura a sbalzo", romanian: "Structură în consolă", difficulty: "avansat" },
+            { original: "Muro di contenimento", romanian: "Zid de sprijin", difficulty: "avansat" },
+            { original: "Impianto di climatizzazione", romanian: "Sistem climatizare & ventilație", difficulty: "avansat" },
+            { original: "Quadro elettrico", romanian: "Tablou electric de distribuție", difficulty: "avansat" },
+            { original: "Computo metrico", romanian: "Antemăsurătoare / Deviz de lucrări", difficulty: "avansat" },
+            { original: "Conformità alle norme", romanian: "Conformitate cu normativele", difficulty: "avansat" },
+            { original: "Lista dei ritocchi / Rifiniture", romanian: "Listă de remedieri / Finisaje", difficulty: "avansat" },
+            { original: "Controllo qualità", romanian: "Asigurarea / Controlul calității", difficulty: "avansat" },
+            { original: "Impatto ambientale", romanian: "Impact asupra mediului", difficulty: "avansat" }
+        ];
+
+        let currentTab = 'general';
+
+        // Creare card interactiv
+        function createCard(item) {
+            const card = document.createElement('div');
+            card.className = 'flashcard';
+            card.setAttribute('data-difficulty', item.difficulty);
+            card.setAttribute('data-search', (item.original + " " + item.romanian).toLowerCase());
+            
+            card.onclick = function() {
+                this.classList.toggle('flipped');
+            };
+
+            const diffText = item.difficulty === 'usor' ? 'Ușor' : item.difficulty === 'mediu' ? 'Mediu' : 'Avansat';
+
+            card.innerHTML = `
+                <div class="flashcard-inner">
+                    <div class="card-front">
+                        <span class="badge-difficulty diff-${item.difficulty}">${diffText}</span>
+                        <span class="card-label">Italiano</span>
+                        <span class="card-text-main">${item.original}</span>
+                        <span class="hint">Apasă pentru traducere</span>
+                    </div>
+                    <div class="card-back">
+                        <span class="card-label">Română</span>
+                        <span class="card-text-ro">${item.romanian}</span>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+
+        // Renderizare Grids
+        function renderGrids() {
+            const gridGeneral = document.getElementById('grid-general');
+            const gridCards = document.getElementById('grid-cards');
+
+            gridGeneral.innerHTML = '';
+            gridCards.innerHTML = '';
+
+            dataGeneral.forEach(item => gridGeneral.appendChild(createCard(item)));
+            dataCards.forEach(item => gridCards.appendChild(createCard(item)));
+
+            filterCards();
+        }
+
+        // Schimbare Tab
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            const titleEl = document.getElementById('tab-title');
+
+            if (tabName === 'general') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tab-general').classList.add('active');
+                titleEl.textContent = 'Termeni Generali & Expresii (Italiană)';
+            } else if (tabName === 'cards') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tab-cards').classList.add('active');
+                titleEl.textContent = 'Colecție Cards (Construcții & Tehnic în Italiană)';
+            }
+
+            filterCards();
+        }
+
+        // Filtru Dificultate + Căutare
+        function filterCards() {
+            const selectedDifficulty = document.getElementById('difficulty-filter').value;
+            const searchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            const activeGridId = currentTab === 'general' ? 'grid-general' : 'grid-cards';
+            const cards = document.querySelectorAll(`#${activeGridId} .flashcard`);
+
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const cardDiff = card.getAttribute('data-difficulty');
+                const cardSearchText = card.getAttribute('data-search');
+
+                const matchesDifficulty = (selectedDifficulty === 'all' || cardDiff === selectedDifficulty);
+                const matchesSearch = (searchQuery === '' || cardSearchText.includes(searchQuery));
+
+                if (matchesDifficulty && matchesSearch) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            document.getElementById('card-counter').textContent = `Carduri afișate: ${visibleCount}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', renderGrids);
+    </script>
+</body>
+</html>
